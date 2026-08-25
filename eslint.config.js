@@ -3,9 +3,10 @@ import js from '@eslint/js'
 import pluginQuery from '@tanstack/eslint-plugin-query'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig(
   { ignores: ['dist', 'src/components/ui'] },
   {
     extends: [
@@ -42,6 +43,17 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+      // Enforce type-only imports for TypeScript types
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          fixStyle: 'inline-type-imports',
+          disallowTypeAnnotations: false,
+        },
+      ],
+      // Prevent duplicate imports from the same module
+      'no-duplicate-imports': 'error',
     },
   }
 )

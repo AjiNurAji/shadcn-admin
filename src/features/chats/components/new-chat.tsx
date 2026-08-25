@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { IconCheck, IconX } from '@tabler/icons-react'
-import { showSubmittedData } from '@/utils/show-submitted-data'
+import { useState } from 'react'
+import { Check, X } from 'lucide-react'
+import { showSubmittedData } from '@/lib/show-submitted-data'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,16 +17,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ChatUser } from '../data/chat-types'
+import { type ChatUser } from '../data/chat-types'
 
 type User = Omit<ChatUser, 'messages'>
 
-type Props = {
+type NewChatProps = {
   users: User[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-export function NewChat({ users, onOpenChange, open }: Props) {
+export function NewChat({ users, onOpenChange, open }: NewChatProps) {
   const [selectedUsers, setSelectedUsers] = useState<User[]>([])
 
   const handleSelectUser = (user: User) => {
@@ -41,26 +41,28 @@ export function NewChat({ users, onOpenChange, open }: Props) {
     setSelectedUsers(selectedUsers.filter((user) => user.id !== userId))
   }
 
-  useEffect(() => {
-    if (!open) {
+  const handleOpenChange = (newOpen: boolean) => {
+    onOpenChange(newOpen)
+    // Reset selected users when dialog closes
+    if (!newOpen) {
       setSelectedUsers([])
     }
-  }, [open])
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[600px]'>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className='sm:max-w-150'>
         <DialogHeader>
           <DialogTitle>New message</DialogTitle>
         </DialogHeader>
         <div className='flex flex-col gap-4'>
-          <div className='flex flex-wrap items-center gap-2'>
-            <span className='text-muted-foreground text-sm'>To:</span>
+          <div className='flex flex-wrap items-baseline-last gap-2'>
+            <span className='min-h-6 text-sm text-muted-foreground'>To:</span>
             {selectedUsers.map((user) => (
               <Badge key={user.id} variant='default'>
                 {user.fullName}
                 <button
-                  className='ring-offset-background focus:ring-ring ml-1 rounded-full outline-hidden focus:ring-2 focus:ring-offset-2'
+                  className='ms-1 rounded-full ring-offset-background outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2'
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleRemoveUser(user.id)
@@ -68,7 +70,7 @@ export function NewChat({ users, onOpenChange, open }: Props) {
                   }}
                   onClick={() => handleRemoveUser(user.id)}
                 >
-                  <IconX className='text-muted-foreground hover:text-foreground h-3 w-3' />
+                  <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
                 </button>
               </Badge>
             ))}
@@ -85,7 +87,7 @@ export function NewChat({ users, onOpenChange, open }: Props) {
                   <CommandItem
                     key={user.id}
                     onSelect={() => handleSelectUser(user)}
-                    className='flex items-center justify-between gap-2'
+                    className='flex items-center justify-between gap-2 hover:bg-accent hover:text-accent-foreground'
                   >
                     <div className='flex items-center gap-2'>
                       <img
@@ -97,14 +99,14 @@ export function NewChat({ users, onOpenChange, open }: Props) {
                         <span className='text-sm font-medium'>
                           {user.fullName}
                         </span>
-                        <span className='text-muted-foreground text-xs'>
-                          {user.username} aa
+                        <span className='text-xs text-accent-foreground/70'>
+                          {user.username}
                         </span>
                       </div>
                     </div>
 
                     {selectedUsers.find((u) => u.id === user.id) && (
-                      <IconCheck className='h-4 w-4' />
+                      <Check className='h-4 w-4' />
                     )}
                   </CommandItem>
                 ))}

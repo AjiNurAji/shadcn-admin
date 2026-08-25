@@ -1,9 +1,11 @@
-import { HTMLAttributes, useState } from 'react'
+import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
-import { cn } from '@/lib/utils'
+import { Loader2, UserPlus } from 'lucide-react'
+import { toast } from 'sonner'
+import { IconFacebook, IconGithub } from '@/assets/brand-icons'
+import { sleep, cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -16,30 +18,27 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
-type SignUpFormProps = HTMLAttributes<HTMLFormElement>
-
 const formSchema = z
   .object({
-    email: z
-      .string()
-      .min(1, { message: 'Please enter your email' })
-      .email({ message: 'Invalid email address' }),
+    email: z.email({
+      error: (iss) =>
+        iss.input === '' ? 'Please enter your email.' : undefined,
+    }),
     password: z
       .string()
-      .min(1, {
-        message: 'Please enter your password',
-      })
-      .min(7, {
-        message: 'Password must be at least 7 characters long',
-      }),
-    confirmPassword: z.string(),
+      .min(1, 'Please enter your password.')
+      .min(7, 'Password must be at least 7 characters long.'),
+    confirmPassword: z.string().min(1, 'Please confirm your password.'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match.",
     path: ['confirmPassword'],
   })
 
-export function SignUpForm({ className, ...props }: SignUpFormProps) {
+export function SignUpForm({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLFormElement>) {
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,12 +52,15 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+    toast.promise(sleep(2000), {
+      loading: 'Creating account...',
+      success: () => {
+        setIsLoading(false)
+        return `Account created for ${data.email}.`
+      },
+      error: 'Error',
+    })
   }
 
   return (
@@ -108,6 +110,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
           )}
         />
         <Button className='mt-2' disabled={isLoading}>
+          {isLoading ? <Loader2 className='animate-spin' /> : <UserPlus />}
           Create Account
         </Button>
 
@@ -116,7 +119,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
             <span className='w-full border-t' />
           </div>
           <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background text-muted-foreground px-2'>
+            <span className='bg-background px-2 text-muted-foreground'>
               Or continue with
             </span>
           </div>
@@ -129,7 +132,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
             type='button'
             disabled={isLoading}
           >
-            <IconBrandGithub className='h-4 w-4' /> GitHub
+            <IconGithub className='h-4 w-4' /> GitHub
           </Button>
           <Button
             variant='outline'
@@ -137,7 +140,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
             type='button'
             disabled={isLoading}
           >
-            <IconBrandFacebook className='h-4 w-4' /> Facebook
+            <IconFacebook className='h-4 w-4' /> Facebook
           </Button>
         </div>
       </form>

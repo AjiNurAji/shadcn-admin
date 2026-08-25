@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
   Popover,
@@ -12,32 +12,31 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 
-interface Props {
+type LongTextProps = {
   children: React.ReactNode
   className?: string
   contentClassName?: string
 }
 
-export default function LongText({
+export function LongText({
   children,
   className = '',
   contentClassName = '',
-}: Props) {
+}: LongTextProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [isOverflown, setIsOverflown] = useState(false)
 
-  useEffect(() => {
-    if (checkOverflow(ref.current)) {
-      setIsOverflown(true)
-      return
+  // Use ref callback to check overflow when element is mounted
+  const refCallback = (node: HTMLDivElement | null) => {
+    ref.current = node
+    if (node && checkOverflow(node)) {
+      queueMicrotask(() => setIsOverflown(true))
     }
-
-    setIsOverflown(false)
-  }, [])
+  }
 
   if (!isOverflown)
     return (
-      <div ref={ref} className={cn('truncate', className)}>
+      <div ref={refCallback} className={cn('truncate', className)}>
         {children}
       </div>
     )
@@ -48,7 +47,7 @@ export default function LongText({
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div ref={ref} className={cn('truncate', className)}>
+              <div ref={refCallback} className={cn('truncate', className)}>
                 {children}
               </div>
             </TooltipTrigger>
@@ -61,7 +60,7 @@ export default function LongText({
       <div className='sm:hidden'>
         <Popover>
           <PopoverTrigger asChild>
-            <div ref={ref} className={cn('truncate', className)}>
+            <div ref={refCallback} className={cn('truncate', className)}>
               {children}
             </div>
           </PopoverTrigger>

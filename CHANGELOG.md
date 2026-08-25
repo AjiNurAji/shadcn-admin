@@ -1,3 +1,94 @@
+## v2.2.1 (2025-11-06)
+
+### Fix
+
+- **style**: update data attribute class in authenticated layout (#249)
+- prevent navigation to 500 page during development (#240)
+- **style**: apply variant 'destructive' to sign-out buttons (#236)
+- add missing space in profile form (#235)
+
+### Refactor
+
+- enhance tables and update table layout (#234)
+
+## v2.2.0 (2025-10-09)
+
+### Feat
+
+- add analytics tab in dashboard page (#220)
+- add extra AppTitle component for sidebar header (#216)
+- update 2-column sign in page (#213)
+
+### Fix
+
+- update sidebar menu chevron direction in RTL mode (#229)
+- pagination button spacing (#215)
+- upgrade lucide-react to solve antivirus warning (#211)
+
+### Refactor
+
+- move sidebar related components into app-sidebar
+- change SidebarInset component from 'main' to 'div'
+- replace extra main container query with content container query
+- replace inline svg logo with logo component (#214)
+
+## v2.1.0 (2025-08-23)
+
+### Feat
+
+- enhance data table pagination with page numbers (#207)
+- enhance auth flow with sign-out dialogs and redirect functionality (#206)
+
+### Refactor
+
+- reorganize utility files into `lib/` folder (#209)
+- extract data-table components and reorganize structure (#208)
+
+## v2.0.0 (2025-08-16)
+
+### BREAKING CHANGE
+
+- CSS file structure has been reorganized
+
+### Feat
+
+- add search param sync in apps route (#200)
+- improve tables and sync table states with search param (#199)
+- add data table bulk action toolbar (#196)
+- add config drawer and update overall layout (#186)
+- RTL support (#179)
+
+### Fix
+
+- adjust layout styles in search and top nav in dashboard page
+- update spacing and layout styles
+- update faceted icon color
+- improve user table hover & selected styles (#195)
+- add max-width for large screens to improve responsiveness (#194)
+- adjust chat border radius for better responsiveness (#193)
+- update hard-coded or inconsistent colors (#191)
+- use variable for inset layout height calculation
+- faded-bottom overflow issue in inset layout
+- hide unnecessary configs on mobile (#189)
+- adjust file input text vertical alignment (#188)
+
+### Refactor
+
+- enforce consistency and code quality (#198)
+- improve code quality and consistency (#197)
+- update error routes (#192)
+- remove DirSwitch component and its usage in Tasks (#190)
+- standardize using cookie as persist state (#187)
+- separate CSS into modular theme and base styles (#185)
+- replace tabler icons with lucide icons (#183)
+
+## v1.4.2 (2025-07-23)
+
+### Fix
+
+- remove unnecessary transitions in table (#176)
+- overflow background in tables (#175)
+
 ## v1.4.1 (2025-06-25)
 
 ### Fix

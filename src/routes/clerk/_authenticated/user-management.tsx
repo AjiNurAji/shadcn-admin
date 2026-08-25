@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useState } from 'react'
 import {
   createFileRoute,
@@ -5,21 +6,20 @@ import {
   useNavigate,
   useRouter,
 } from '@tanstack/react-router'
-import { IconArrowUpRight, IconLoader2 } from '@tabler/icons-react'
-import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react'
+import { useAuth, UserButton } from '@clerk/react'
+import { ExternalLink, Loader2 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { Button } from '@/components/ui/button'
+import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { LearnMore } from '@/components/learn-more'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { columns } from '@/features/users/components/users-columns'
 import { UsersDialogs } from '@/features/users/components/users-dialogs'
 import { UsersPrimaryButtons } from '@/features/users/components/users-primary-buttons'
+import { UsersProvider } from '@/features/users/components/users-provider'
 import { UsersTable } from '@/features/users/components/users-table'
-import UsersProvider from '@/features/users/context/users-context'
-import { userListSchema } from '@/features/users/data/schema'
 import { users } from '@/features/users/data/users'
 
 export const Route = createFileRoute('/clerk/_authenticated/user-management')({
@@ -27,13 +27,16 @@ export const Route = createFileRoute('/clerk/_authenticated/user-management')({
 })
 
 function UserManagement() {
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+
   const [opened, setOpened] = useState(true)
   const { isLoaded, isSignedIn } = useAuth()
 
   if (!isLoaded) {
     return (
       <div className='flex h-svh items-center justify-center'>
-        <IconLoader2 className='size-8 animate-spin' />
+        <Loader2 className='size-8 animate-spin' />
       </div>
     )
   }
@@ -42,62 +45,53 @@ function UserManagement() {
     return <Unauthorized />
   }
 
-  // Parse user list
-  const userList = userListSchema.parse(users)
   return (
-    <>
-      <SignedIn>
-        <UsersProvider>
-          <Header fixed>
-            <Search />
-            <div className='ml-auto flex items-center space-x-4'>
-              <ThemeSwitch />
-              <UserButton />
-            </div>
-          </Header>
+    <UsersProvider>
+      <Header fixed>
+        <Search className='me-auto' />
+        <ThemeSwitch />
+        <ConfigDrawer />
+        <UserButton />
+      </Header>
 
-          <Main>
-            <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
-              <div>
-                <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
-                <div className='flex gap-1'>
-                  <p className='text-muted-foreground'>
-                    Manage your users and their roles here.
-                  </p>
-                  <LearnMore
-                    open={opened}
-                    onOpenChange={setOpened}
-                    contentProps={{ side: 'right' }}
+      <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
+        <div className='flex flex-wrap items-end justify-between gap-2'>
+          <div>
+            <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
+            <div className='flex gap-1'>
+              <p className='text-muted-foreground'>
+                Manage your users and their roles here.
+              </p>
+              <LearnMore
+                open={opened}
+                onOpenChange={setOpened}
+                contentProps={{ side: 'right' }}
+              >
+                <p>
+                  This is the same as{' '}
+                  <Link
+                    to='/users'
+                    className='text-blue-500 underline decoration-dashed underline-offset-2'
                   >
-                    <p>
-                      This is the same as{' '}
-                      <Link
-                        to='/users'
-                        className='text-blue-500 underline decoration-dashed underline-offset-2'
-                      >
-                        '/users'
-                      </Link>
-                    </p>
+                    '/users'
+                  </Link>
+                </p>
 
-                    <p className='mt-4'>
-                      You can sign out or manage/delete your account via the
-                      User Profile menu in the top-right corner of the page.
-                      <IconArrowUpRight className='inline-block size-4' />
-                    </p>
-                  </LearnMore>
-                </div>
-              </div>
-              <UsersPrimaryButtons />
+                <p className='mt-4'>
+                  You can sign out or manage/delete your account via the User
+                  Profile menu in the top-right corner of the page.
+                  <ExternalLink className='inline-block size-4' />
+                </p>
+              </LearnMore>
             </div>
-            <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-              <UsersTable data={userList} columns={columns} />
-            </div>
-          </Main>
+          </div>
+          <UsersPrimaryButtons />
+        </div>
+        <UsersTable data={users} navigate={navigate} search={search} />
+      </Main>
 
-          <UsersDialogs />
-        </UsersProvider>
-      </SignedIn>
-    </>
+      <UsersDialogs />
+    </UsersProvider>
   )
 }
 
@@ -131,7 +125,7 @@ function Unauthorized() {
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
         <h1 className='text-[7rem] leading-tight font-bold'>401</h1>
         <span className='font-medium'>Unauthorized Access</span>
-        <p className='text-muted-foreground text-center'>
+        <p className='text-center text-muted-foreground'>
           You must be authenticated via Clerk{' '}
           <sup>
             <LearnMore open={opened} onOpenChange={setOpened}>
